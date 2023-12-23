@@ -23,8 +23,18 @@ import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FilenameFilter
 import java.io.IOException
+import java.io.BufferedInputStream
+import java.io.BufferedOutputStream
+import java.io.InputStream
+import java.util.zip.ZipInputStream
+import java.io.FileOutputStream
+import kotlinx.coroutines.withContext
 
-class FirmwareImportPreference @JvmOverloads constructor(context : Context, attrs : AttributeSet? = null, defStyleAttr : Int = androidx.preference.R.attr.preferenceStyle) : Preference(context, attrs, defStyleAttr) {
+class FirmwareImportPreference @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = androidx.preference.R.attr.preferenceStyle
+) : Preference(context, attrs, defStyleAttr) {
     private class Firmware(val valid : Boolean, val version : String)
 
     private val firmwarePath = File(context.getPublicFilesDir().canonicalPath + "/switch/nand/system/Contents/registered/")
@@ -41,12 +51,13 @@ class FirmwareImportPreference @JvmOverloads constructor(context : Context, attr
 
             val cacheFirmwareDir = File("${context.cacheDir.path}/registered/")
 
-            val task : () -> Unit = {
-                var messageToShow : Int
+            val task: suspend () -> Unit = {
+                var messageToShow: Int
 
                 try {
                     // Unzip in cache dir to not delete previous firmware in case the zip given doesn't contain a valid one
-                    ZipUtils.unzip(inputZip, cacheFirmwareDir)
+   
+                   ZipUtils.unzipWithBufferedStreams(inputZip, cacheFirmwareDir)
 
                     val firmware = isFirmwareValid(cacheFirmwareDir)
                     messageToShow = if (!firmware.valid) {
@@ -56,12 +67,13 @@ class FirmwareImportPreference @JvmOverloads constructor(context : Context, attr
                         cacheFirmwareDir.copyRecursively(firmwarePath, true)
                         persistString(firmware.version)
                         extractFonts(firmwarePath.path, keysPath, fontsPath)
-                        CoroutineScope(Dispatchers.Main).launch {
+-                        CoroutineScope(Dispatchers.Main).launch {
++                        withContext(Dispatchers.Main) {
                             notifyChanged()
                         }
                         R.string.import_firmware_success
                     }
-                } catch (e : IOException) {
+                } catch (e: IOException) {
                     messageToShow = R.string.error
                 } finally {
                     cacheFirmwareDir.deleteRecursively()
@@ -91,11 +103,6 @@ class FirmwareImportPreference @JvmOverloads constructor(context : Context, attr
 
     override fun onClick() = documentPicker.launch(arrayOf("application/zip"))
 
-    /**
-     * Checks if the given directory stores a valid firmware. For that, all files must be NCAs and
-     * one of them must store the firmware version.
-     * @return A pair that tells if the firmware is valid, and if so, which firmware version it is
-     */
     private fun isFirmwareValid(cacheFirmwareDir : File) : Firmware {
         val filterNCA = FilenameFilter { _, dirName -> dirName.endsWith(".nca") }
 
@@ -110,4 +117,27 @@ class FirmwareImportPreference @JvmOverloads constructor(context : Context, attr
 
     private external fun fetchFirmwareVersion(systemArchivesPath : String, keysPath : String) : String
     private external fun extractFonts(systemArchivesPath : String, keysPath : String, fontsPath : String)
+
+    // Add this function for optimized unzipping using buffered streams
+    @Throws(IOException::class)
+    private fun unzipWithBufferedStreams(zipInputStream: InputStream, destination: File) {
+        ZipInputStream(BufferedInputStream(zipInputStream)).use { zip ->
+            var entry = zip.nextEntry
+            while (entry != null) {
+                val entryFile = File(destination, entry.name)
+                if (entry.isDirectory) {
+                    entryFile.mkdirs()
+                } else {
+                    entryFile.parentFile?.mkdirs()
+                    FileOutputStream(entryFile).use { fos ->
+                        BufferedOutputStream(fos).use { bos ->
+                            zip.copyTo(bos, DEFAULT_BUFFER_SIZE)
+                        }
+                    }
+                }
+                entry = zip.nextEntry
+            }
+        }
+    }
 }
+
