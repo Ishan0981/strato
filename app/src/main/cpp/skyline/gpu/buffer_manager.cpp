@@ -26,19 +26,21 @@ namespace skyline::gpu {
         LockedBuffers overlaps;
 
         // Try to do a fast lookup in the page table
-        auto lookupBuffer{bufferTable[range.begin().base()]};
-        if (lookupBuffer != nullptr && lookupBuffer->guest->contains(range)) {
-            overlaps.emplace_back(lookupBuffer->shared_from_this(), tag);
-            return overlaps;
-        }
-
-        // If we cannot find the buffer quickly, do a binary search to find all overlapping buffers
-        auto entryIt{std::lower_bound(bufferMappings.begin(), bufferMappings.end(), range.end().base(), BufferLessThan)};
-        while (entryIt != bufferMappings.begin() && (*--entryIt)->guest->begin() <= range.end())
-            if ((*entryIt)->guest->end() > range.begin())
-                overlaps.emplace_back(*entryIt, tag);
-
+    auto lookupBuffer = bufferTable[range.begin().base()];
+    if (lookupBuffer != nullptr && lookupBuffer->guest->contains(range)) {
+        overlaps.emplace_back(lookupBuffer->shared_from_this(), tag);
         return overlaps;
+    }
+
+    // If we cannot find the buffer quickly, do a binary search to find all overlapping buffers
+    auto lowerBoundIt = std::lower_bound(bufferMappings.begin(), bufferMappings.end(), range.end().base(), BufferLessThan);
+
+    for (auto entryIt = lowerBoundIt; entryIt != bufferMappings.begin() && (*--entryIt)->guest->begin() <= range.end(); --entryIt) {
+        if ((*entryIt)->guest->end() > range.begin())
+            overlaps.emplace_back(*entryIt, tag);
+    }
+
+    return overlaps;
     }
 
     void BufferManager::InsertBuffer(std::shared_ptr<Buffer> buffer) {
