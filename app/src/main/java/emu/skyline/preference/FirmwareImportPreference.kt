@@ -18,7 +18,7 @@ import emu.skyline.getPublicFilesDir
 import emu.skyline.settings.SettingsActivity
 import emu.skyline.utils.ZipUtils
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FilenameFilter
