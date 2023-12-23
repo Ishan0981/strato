@@ -10,7 +10,7 @@ namespace skyline::gpu {
     std::shared_ptr<TextureView> TextureManager::FindOrCreate(const GuestTexture &guestTexture, ContextTag tag) {
         TRACE_EVENT("gpu", "TextureManager::FindOrCreate");
 
-        const auto& guestMapping = guestTexture.mappings.front();
+        auto guestMapping{guestTexture.mappings.front()};
 
         /*
          * Iterate over all textures that overlap with the first mapping of the guest texture and compare the mappings:
