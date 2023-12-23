@@ -88,17 +88,17 @@ namespace skyline::gpu {
         newBuffer->SynchronizeHost(false); // Overlaps don't necessarily fully cover the buffer so we have to perform a sync here to prevent any gaps
         newBuffer->cycle = newBufferCycle;
 
-        auto copyBuffer{[](auto dstGuest, auto srcGuest, auto dstPtr, auto srcPtr) {
-            if (dstGuest.begin().base() <= srcGuest.begin().base()) {
-                size_t dstOffset{static_cast<size_t>(srcGuest.begin().base() - dstGuest.begin().base())};
-                size_t copySize{std::min(dstGuest.size() - dstOffset, srcGuest.size())};
-                std::memcpy(dstPtr + dstOffset, srcPtr, copySize);
-            } else if (dstGuest.begin().base() > srcGuest.begin().base()) {
-                size_t srcOffset{static_cast<size_t>(dstGuest.begin().base() - srcGuest.begin().base())};
-                size_t copySize{std::min(dstGuest.size(), srcGuest.size() - srcOffset)};
-                std::memcpy(dstPtr, srcPtr + srcOffset, copySize);
-            }
-        }}; //!< Copies between two buffers based off of their mappings in guest memory
+        auto copyBuffer = [](auto dstGuest, auto srcGuest, auto dstPtr, auto srcPtr) {
+    if (dstGuest.begin().base() <= srcGuest.begin().base()) {
+        size_t dstOffset{static_cast<size_t>(srcGuest.begin().base() - dstGuest.begin().base())};
+        size_t copySize{std::min(dstGuest.size() - dstOffset, srcGuest.size())};
+        std::move(srcPtr, srcPtr + copySize, dstPtr + dstOffset);
+    } else if (dstGuest.begin().base() > srcGuest.begin().base()) {
+        size_t srcOffset{static_cast<size_t>(dstGuest.begin().base() - srcGuest.begin().base())};
+        size_t copySize{std::min(dstGuest.size(), srcGuest.size() - srcOffset)};
+        std::move(srcPtr + srcOffset, srcPtr + srcOffset + copySize, dstPtr);
+    }
+}; //!< Copies between two buffers based off of their mappings in guest memory
 
         for (auto &srcBuffer : srcBuffers) {
             // All newly created buffers that have this set are guaranteed to be attached in buffer FindOrCreate, attach will then lock the buffer without resetting this flag, which will only finally be reset when the lock is released
