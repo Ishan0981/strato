@@ -29,6 +29,9 @@ import java.io.InputStream
 import java.util.zip.ZipInputStream
 import java.io.FileOutputStream
 import kotlinx.coroutines.withContext
+import java.nio.file.StandardCopyOption
+import java.nio.file.Files
+import java.nio.file.Paths
 
 class FirmwareImportPreference @JvmOverloads constructor(
     context: Context,
@@ -36,7 +39,9 @@ class FirmwareImportPreference @JvmOverloads constructor(
     defStyleAttr: Int = androidx.preference.R.attr.preferenceStyle
 ) : Preference(context, attrs, defStyleAttr) {
     private class Firmware(val valid : Boolean, val version : String)
-
+    
+    private const val DEFAULT_BUFFER_SIZE = 8192
+    
     private val firmwarePath = File(context.getPublicFilesDir().canonicalPath + "/switch/nand/system/Contents/registered/")
     private val keysPath = "${context.filesDir.canonicalPath}/keys/"
     private val fontsPath = "${context.getPublicFilesDir().canonicalPath}/fonts/"
