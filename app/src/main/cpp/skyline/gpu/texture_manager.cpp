@@ -10,7 +10,7 @@ namespace skyline::gpu {
     std::shared_ptr<TextureView> TextureManager::FindOrCreate(const GuestTexture &guestTexture, ContextTag tag) {
         TRACE_EVENT("gpu", "TextureManager::FindOrCreate");
 
-        auto guestMapping{guestTexture.mappings.front()};
+        const auto& guestMapping = guestTexture.mappings.front();
 
         /*
          * Iterate over all textures that overlap with the first mapping of the guest texture and compare the mappings:
@@ -40,7 +40,7 @@ namespace skyline::gpu {
         u32 matchLayer{};
 
         while (hostMapping != textures.begin() && (--hostMapping)->end() > guestMapping.begin()) {
-            auto &hostMappings{hostMapping->texture->guest->mappings};
+            auto& hostMappings = hostMapping->texture->guest->mappings;
             if (!hostMapping->contains(guestMapping) || hostMapping->texture->replaced)
                 continue;
 
@@ -59,16 +59,17 @@ namespace skyline::gpu {
                 // We've gotten a perfect 1:1 match for *all* mappings from the start to end, we just need to check for compatibility aside from this
                 auto &matchGuestTexture{*hostMapping->texture->guest};
                 if (matchGuestTexture.format->IsCompatible(*guestTexture.format) &&
-                    ((((matchGuestTexture.dimensions.width == guestTexture.dimensions.width &&
-                        matchGuestTexture.dimensions.height == guestTexture.dimensions.height) || matchGuestTexture.CalculateLayerSize() == guestTexture.CalculateLayerSize()) &&
-                        matchGuestTexture.GetViewDepth() <= guestTexture.GetViewDepth())
-                        || matchGuestTexture.viewMipBase > 0)
-                    && matchGuestTexture.tileConfig == guestTexture.tileConfig) {
-                    fullMatch = hostMapping->texture;
-                } else {
-                    matches.push_back(hostMapping->texture);
-                }
-            } else {
+            ((((matchGuestTexture.dimensions.width == guestTexture.dimensions.width &&
+                matchGuestTexture.dimensions.height == guestTexture.dimensions.height) || matchGuestTexture.CalculateLayerSize() == guestTexture.CalculateLayerSize()) &&
+                matchGuestTexture.GetViewDepth() <= guestTexture.GetViewDepth())
+                || matchGuestTexture.viewMipBase > 0)
+            && matchGuestTexture.tileConfig == guestTexture.tileConfig) {
+            fullMatch = hostMapping->texture;
+        } else {
+            // Use emplace_back to construct the object in place
+            matches.emplace_back(hostMapping->texture);
+        }
+    } else {
                 auto &matchGuestTexture{*hostMapping->texture->guest};
                 if (matchGuestTexture.format->IsCompatible(*guestTexture.format) && matchGuestTexture.tileConfig == guestTexture.tileConfig &&
                         (!layerMipMatch || (matchGuestTexture.GetViewLayerCount() >= layerMipMatch->guest->GetViewLayerCount() && matchGuestTexture.mipLevelCount >= layerMipMatch->guest->mipLevelCount))) {
