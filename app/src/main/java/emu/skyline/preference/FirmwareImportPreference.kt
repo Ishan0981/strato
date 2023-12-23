@@ -60,6 +60,7 @@ class FirmwareImportPreference @JvmOverloads constructor(context : Context, attr
                         CoroutineScope(Dispatchers.Main).launch {
                             notifyChanged()
                         }
+                        }
                         R.string.import_firmware_success
                     }
                 } catch (e : IOException) {
