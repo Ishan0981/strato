@@ -16,13 +16,17 @@ namespace skyline::gpu::memory {
     Buffer::~Buffer() {
         if (vmaAllocator && vmaAllocation && vkBuffer)
             vmaDestroyBuffer(vmaAllocator, vkBuffer, vmaAllocation);
+            vkBuffer = VK_NULL_HANDLE;
     }
 
     Image::~Image() {
         if (vmaAllocator && vmaAllocation && vkImage) {
             if (pointer)
                 vmaUnmapMemory(vmaAllocator, vmaAllocation);
+                pointer = nullptr;
+        }
             vmaDestroyImage(vmaAllocator, vkImage, vmaAllocation);
+            vkImage = VK_NULL_HANDLE;
         }
     }
 
@@ -33,7 +37,7 @@ namespace skyline::gpu::memory {
         return pointer;
     }
 
-    MemoryManager::MemoryManager(GPU &pGpu) : gpu{pGpu} {
+    MemoryManager::MemoryManager(GPU &pGpu) : gpu{pGpu}, vmaAllocator{nullptr} {
         auto instanceDispatcher{gpu.vkInstance.getDispatcher()};
         auto deviceDispatcher{gpu.vkDevice.getDispatcher()};
         VmaVulkanFunctions vulkanFunctions{
