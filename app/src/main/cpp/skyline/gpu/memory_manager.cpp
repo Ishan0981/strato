@@ -14,17 +14,18 @@ namespace skyline::gpu::memory {
     }
 
     Buffer::~Buffer() {
-        if (vmaAllocator && vmaAllocation && vkBuffer)
+        if (vmaAllocator && vmaAllocation && vkBuffer) {
             vmaDestroyBuffer(vmaAllocator, vkBuffer, vmaAllocation);
             vkBuffer = VK_NULL_HANDLE;
+        }
     }
 
     Image::~Image() {
         if (vmaAllocator && vmaAllocation && vkImage) {
-            if (pointer)
+            if (pointer) {
                 vmaUnmapMemory(vmaAllocator, vmaAllocation);
                 pointer = nullptr;
-        }
+            }
             vmaDestroyImage(vmaAllocator, vkImage, vmaAllocation);
             vkImage = VK_NULL_HANDLE;
         }
