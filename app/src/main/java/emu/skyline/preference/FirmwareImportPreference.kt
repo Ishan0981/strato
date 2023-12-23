@@ -52,6 +52,7 @@ class FirmwareImportPreference @JvmOverloads constructor(context : Context, attr
                     messageToShow = if (!firmware.valid) {
                         R.string.import_firmware_invalid_contents
                     } else {
+                        launch(Dispatchers.IO) {
                         firmwarePath.deleteRecursively()
                         cacheFirmwareDir.copyRecursively(firmwarePath, true)
                         persistString(firmware.version)
