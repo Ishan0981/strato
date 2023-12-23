@@ -93,35 +93,20 @@ namespace skyline::gpu {
         bool try_lock();
 
         /**
-         * @brief Lock-free method for checking if the buffer exists in the table
-         * @param bufferStart The start address of the buffer
-         * @return The buffer if found, nullptr otherwise
-         */
-        std::shared_ptr<Buffer> FindBufferNoLock(u8* bufferStart) const {
-            auto lookupBuffer = bufferTable[bufferStart];
-            return (lookupBuffer != nullptr && lookupBuffer->guest->contains(bufferStart)) ? lookupBuffer : nullptr;
-        }
-
-       /**
-         * @brief Optimized FindOrCreate method that first tries to find the buffer without acquiring a lock
-         * @param guestMapping The guest buffer mapping
-         * @param tag The context tag
-         * @param attachBuffer The function to attach the buffer to the current context
-         * @return A pre-existing or newly created Buffer object
+         * @param attachBuffer A function that attaches the buffer to the current context, this'll be called when coalesced buffers are merged into the current buffer
+         * @return A pre-existing or newly created Buffer object which covers the supplied mappings
          * @note The buffer manager **must** be locked prior to calling this
          */
+        BufferView FindOrCreateImpl(GuestBuffer guestMapping, ContextTag tag, const std::function<void(std::shared_ptr<Buffer>, ContextLock<Buffer> &&)> &attachBuffer);
+
         BufferView FindOrCreate(GuestBuffer guestMapping, ContextTag tag = {}, const std::function<void(std::shared_ptr<Buffer>, ContextLock<Buffer> &&)> &attachBuffer = {}) {
             TRACE_EVENT("gpu", "BufferManager::FindOrCreate");
-
-            // Attempt to find the buffer without acquiring the lock
-            if (auto lookupBuffer = FindBufferNoLock(guestMapping.begin().base())) {
-                if (auto view = lookupBuffer->TryGetView(guestMapping))
+            auto lookupBuffer{bufferTable[guestMapping.begin().base()]};
+            if (lookupBuffer != nullptr)
+                if (auto view{lookupBuffer->TryGetView(guestMapping)}; view)
                     return view;
-            }
 
-            // If not found, proceed to create the buffer
             return FindOrCreateImpl(guestMapping, tag, attachBuffer);
         }
     };
-
-} 
+}
