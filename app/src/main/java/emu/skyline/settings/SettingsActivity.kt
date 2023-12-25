@@ -123,6 +123,18 @@ class SettingsActivity : AppCompatActivity(), PreferenceFragmentCompat.OnPrefere
                 .replace(R.id.settings, preferenceFragment)
                 .commit()
         }
+        
+        // Set minimum value for SeekBarPreference
+        setMinimumValueForSeekBarPreference()
+    }
+    
+    private fun setMinimumValueForSeekBarPreference() {
+        // Check if the fragment is an instance of GameSettingsFragment
+        if (preferenceFragment is GameSettingsFragment) {
+            // Cast to GameSettingsFragment and set minimum value for SeekBarPreference
+            val gameSettingsFragment = preferenceFragment as GameSettingsFragment
+            gameSettingsFragment.findPreference<SeekBarPreference>("executor_slot_count_scale")?.min = 1
+        }
     }
 
     override fun onCreateOptionsMenu(menu : Menu?) : Boolean {
