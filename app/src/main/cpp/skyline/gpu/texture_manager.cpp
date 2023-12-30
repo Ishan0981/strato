@@ -14,8 +14,9 @@ namespace skyline::gpu {
 
         // Adjust the resolution when creating a GuestTexture
         GuestTexture adjustedGuestTexture = guestTexture;
-        guestTexture.dimensions.width = 1920; // Set to desired width
-        guestTexture.dimensions.height = 1080; // Set to desired height
+        adjustedGuestTexture.dimensions.width = 1920; // Set to desired width
+        adjustedGuestTexture.dimensions.height = 1080; // Set to desired height
+
 
         /*
          * Iterate over all textures that overlap with the first mapping of the guest texture and compare the mappings:
