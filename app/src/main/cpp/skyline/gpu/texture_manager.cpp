@@ -13,7 +13,7 @@ namespace skyline::gpu {
         auto guestMapping{guestTexture.mappings.front()};
 
         // Adjust the resolution when creating a GuestTexture
-        GuestTexture guestTexture;
+        GuestTexture adjustedGuestTexture;
         guestTexture.dimensions.width = 1920; // Set to desired width
         guestTexture.dimensions.height = 1080; // Set to desired height
 
