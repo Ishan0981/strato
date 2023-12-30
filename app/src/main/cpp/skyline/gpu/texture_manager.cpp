@@ -12,6 +12,11 @@ namespace skyline::gpu {
 
         auto guestMapping{guestTexture.mappings.front()};
 
+        // Adjust the resolution when creating a GuestTexture
+        GuestTexture guestTexture;
+        guestTexture.dimensions.width = 1920; // Set to desired width
+        guestTexture.dimensions.height = 1080; // Set to desired height
+
         /*
          * Iterate over all textures that overlap with the first mapping of the guest texture and compare the mappings:
          * 1) All mappings match up perfectly, we check that the rest of the supplied mappings correspond to mappings in the texture
@@ -133,6 +138,9 @@ namespace skyline::gpu {
 
         for (auto &texture : matches)
             texture->SynchronizeGuest(false, true);
+
+        for (auto &texture : textures)
+        texture->guest->UpdateDimensions(1920, 1080);
 
         // Create a texture as we cannot find one that matches
         auto texture{std::make_shared<Texture>(gpu, guestTexture)};
