@@ -367,6 +367,7 @@
 <color name="colorRamUsage">#9f2fff00</color>
 <color name="dividerColor">@android:color/black</color>
 <color name="onBackgroundLight">#1e000000</color>
-<color name="meterial_background">#ffe3e1ec</color>
+<color name="material_app_item_outline">#C9C6CF</color>
 <color name="appbar_background">#fffeeef8</color>
+<color name="cardview_androidx_color">#FDFBFE</color>
 </resources>

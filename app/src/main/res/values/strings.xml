@@ -107,6 +107,9 @@
     <string name="respect_display_cutout">Respect Display Cutout</string>
     <string name="respect_display_cutout_enabled">Do not draw UI elements in the cutout area</string>
     <string name="respect_display_cutout_disabled">Allow UI elements to be drawn in the cutout area</string>
+    <string name="picture_in_picture">Picture In Picture</string>
+    <string name="picture_in_picture_enabled">Minimize window when placed in the background</string>
+    <string name="picture_in_picture_disabled">Minimize window when placed in the background</string>
     <string name="enable_foldable_layout">Enable Foldable Layout</string>
     <string name="enable_foldable_layout_enabled">Folded devices will display game and controller separately</string>
     <string name="enable_foldable_layout_disabled">Display controller over games even when device is folded</string>
@@ -303,6 +306,9 @@
     <string name="save_data_found">Save data found. What would you like to do?</string>
     <string name="save_data_not_found">No save data found. What would you like to do?</string>
     <string name="delete_save_confirmation_message">Are you sure you want to delete this save?</string>
+    <string name="delete_shader_cache_confirmation_message">Are you sure you want to delete all cached shaders?</string>
+    <string name="manage_shader_cache">Manage shader cache</string>
+    <string name="clear_shader_cache">Clear shader cache</string>
     <string name="action_irreversible">This action is irreversible</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>

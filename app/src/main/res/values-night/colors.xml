@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-<color name="meterial_background">#ff222629</color>
+<color name="material_app_item_outline">#48474C</color>
 <color name="appbar_background">#ff26292e</color>
+<color name="cardview_androidx_color">#1B1A1F</color>
 </resources>

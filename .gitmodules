@@ -34,19 +34,9 @@
 [submodule "Boost"]
 	path = app/libraries/boost
 	url = https://github.com/strato-emu/boost.git
-[submodule "LLVM"]
-	path = app/libraries/llvm
-	url = https://github.com/llvm/llvm-project.git
-	shallow = true
 [submodule "C++ Range v3"]
 	path = app/libraries/range
 	url = https://github.com/ericniebler/range-v3
-[submodule "Sirit"]
-	path = app/libraries/sirit
-	url = https://github.com/yuzu-emu/sirit
-[submodule "Shader Compiler"]
-	path = app/libraries/shader-compiler
-	url = https://github.com/strato-emu/shader-compiler.git
 [submodule "libadrenotools"]
 	path = app/libraries/adrenotools
 	url = https://github.com/bylaws/libadrenotools/
@@ -59,6 +49,15 @@
 [submodule "app/libraries/cubeb"]
 	path = app/libraries/cubeb
 	url = https://github.com/skyline-emu/cubeb
+[submodule "Dynarmic"]
+	path = app/libraries/dynarmic
+	url = https://github.com/strato-emu/dynarmic.git
+[submodule "Shader Compiler"]
+	path = app/libraries/shader-compiler
+	url = https://github.com/Ishan09811/shader-compiler
+[submodule "Sirit"]
+	path = app/libraries/sirit
+	url = https://github.com/Ishan09811/sirit
 [submodule "app/libraries/audio-core"]
 	path = app/libraries/audio-core
-	url = https://github.com/skyline-emu/audio-core
+	url = https://github.com/Ishan09811/audio-core

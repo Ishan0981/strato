@@ -9,8 +9,7 @@
 	android:layout_height="wrap_content" 
 	android:layout_marginLeft="15.0dip" 
 	android:layout_marginTop="15.0dip" 
-	android:foreground="@drawable/rounded_selectable_item_background" 
-	android:elevation="20.0dip">
+	android:foreground="@drawable/rounded_selectable_item_background">
 	<com.google.android.material.card.MaterialCardView 
 		android:id="@id/item_card" 
 		android:layout_width="fill_parent" 
@@ -26,7 +25,6 @@
 			android:contentDescription="@string/icon" />
 	</com.google.android.material.card.MaterialCardView>
 	<TextView 
-		android:textColor="#ff01a4cc" 
 		android:ellipsize="marquee" 
 		android:id="@id/text_title" 
 		android:layout_width="wrap_content" 
@@ -37,7 +35,6 @@
 		android:layout_marginEnd="10.0dip" 
 		style="?textAppearanceTitleSmall" />
 	<TextView 
-	        android:textColor="#fffa3722" 
 		android:ellipsize="marquee" 
 		android:id="@id/text_version" 
 		android:layout_width="wrap_content" 
@@ -48,7 +45,6 @@
 		android:layout_marginEnd="10.0dip" 
 		style="?textAppearanceBodySmall" />
 	<TextView 
-		android:textColor="#ff1db0ea" 
 		android:ellipsize="marquee" 
 		android:id="@id/text_author" 
 		android:layout_width="wrap_content" 

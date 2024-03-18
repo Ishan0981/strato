@@ -47,6 +47,7 @@ import emu.skyline.utils.WindowInsetsHelper
 import java.util.Collections
 import javax.inject.Inject
 import kotlin.math.ceil
+import com.google.android.material.R as MaterialR
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -114,13 +115,18 @@ class MainActivity : AppCompatActivity() {
         PreferenceManager.setDefaultValues(this, R.xml.app_preferences, false)
         PreferenceManager.setDefaultValues(this, R.xml.emulation_preferences, false)
 
+        binding.subText.text = BuildConfig.VERSION_NAME
+        // The first click event is consumed by the focus acquisition
+        // Subsequent clicks should be interpreted as a request to clear focus
+        binding.subText.setOnClickListener { if (it.isFocused) binding.subText.clearFocus() }
+
         binding.appList.setHasFixedSize(true)
 
         setupAppList()
 
         binding.swipeRefreshLayout.apply {
-            setProgressBackgroundColorSchemeColor(obtainStyledAttributes(intArrayOf(R.attr.colorSurfaceVariant)).use { it.getColor(0, Color.BLACK) })
-            setColorSchemeColors(obtainStyledAttributes(intArrayOf(R.attr.colorPrimary)).use { it.getColor(0, Color.WHITE) })
+            setProgressBackgroundColorSchemeColor(obtainStyledAttributes(intArrayOf(MaterialR.attr.colorSurfaceVariant)).use { it.getColor(0, Color.BLACK) })
+            setColorSchemeColors(obtainStyledAttributes(intArrayOf(MaterialR.attr.colorPrimary)).use { it.getColor(0, Color.WHITE) })
             post { setDistanceToTriggerSync(binding.swipeRefreshLayout.height / 3) }
             setOnRefreshListener { loadRoms(false) }
         }

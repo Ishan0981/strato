@@ -16,28 +16,6 @@ set(CMAKE_CXX_FLAGS_RELEASE "-Ofast -flto=full -fno-stack-protector -DNDEBUG")
 set(CMAKE_CXX_FLAGS_DEBUG "-Ofast")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-Ofast")
 
-# libcxxabi
-set(ANDROID_STL "none")
-set(LIBCXXABI_INCLUDE_TESTS OFF)
-set(LIBCXXABI_ENABLE_SHARED OFF)
-set(LIBCXXABI_ENABLE_ASSERTIONS OFF)
-set(LIBCXXABI_LIBCXX_INCLUDES "${LIBCXX_TARGET_INCLUDE_DIRECTORY}" CACHE STRING "" FORCE)
-add_subdirectory("libraries/llvm/libcxxabi")
-
-# libcxx
-set(LIBCXX_INCLUDE_TESTS OFF)
-set(LIBCXX_INCLUDE_BENCHMARKS OFF)
-set(LIBCXX_INCLUDE_DOCS OFF)
-set(LIBCXX_ENABLE_SHARED OFF)
-set(LIBCXX_ENABLE_ASSERTIONS OFF)
-set(LIBCXX_ENABLE_STATIC_ABI_LIBRARY ON)
-add_subdirectory("libraries/llvm/libcxx")
-link_libraries(cxx_static)
-get_target_property(LIBCXX_INCLUDE_COMPILE_OPTION cxx-headers INTERFACE_INCLUDE_DIRECTORIES)
-string(REGEX REPLACE "-I" "" LIBCXX_INCLUDE_DIRECTORY_LIST "${LIBCXX_INCLUDE_COMPILE_OPTION}")
-list(GET LIBCXX_INCLUDE_DIRECTORY_LIST 1 LIBCXX_TARGET_INCLUDE_DIRECTORY) # We just want the target include directory
-set_target_properties(cxx-headers PROPERTIES INTERFACE_COMPILE_OPTIONS -isystem${LIBCXX_TARGET_INCLUDE_DIRECTORY})
-
 # Skyline's Boost fork
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
@@ -100,6 +78,7 @@ set(BUILD_TOOLS OFF)
 add_subdirectory("libraries/cubeb")
 include_directories(SYSTEM "libraries/cubeb/include")
 
+
 # Perfetto SDK
 include_directories(SYSTEM "libraries/perfetto/sdk")
 add_library(perfetto STATIC libraries/perfetto/sdk/perfetto.cc)
@@ -151,6 +130,18 @@ target_link_libraries_system(shader_recompiler Boost::intrusive Boost::container
 add_subdirectory("libraries/audio-core")
 include_directories(SYSTEM "libraries/audio-core/include")
 target_link_libraries_system(audio_core Boost::intrusive Boost::container range-v3)
+
+# Dynarmic
+set(DYNARMIC_FRONTENDS "A32" CACHE STRING "Enabled Dynarmic frontends")
+set(DYNARMIC_INSTALL OFF CACHE BOOL "Skip Dynarmic installation")
+add_subdirectory("libraries/dynarmic")
+target_include_directories(dynarmic PUBLIC "libraries/dynarmic/src")
+
+
+
+
+
+
 
 # Skyline
 add_library(skyline SHARED
@@ -421,5 +412,7 @@ target_include_directories(skyline PRIVATE ${source_DIR}/skyline)
 # target_precompile_headers(skyline PRIVATE ${source_DIR}/skyline/common.h) # PCH will currently break Intellisense
 target_compile_options(skyline PRIVATE -Wall -Wno-unknown-attributes -Wno-c++20-extensions -Wno-c++17-extensions -Wno-c99-designator -Wno-reorder -Wno-missing-braces -Wno-unused-variable -Wno-unused-private-field -Wno-dangling-else -Wconversion -fsigned-bitfields)
 
-target_link_libraries(skyline PRIVATE shader_recompiler audio_core)
-target_link_libraries_system(skyline android perfetto fmt lz4_static tzcode vkma mbedcrypto opus Boost::intrusive Boost::container Boost::preprocessor range-v3 adrenotools tsl::robin_map)
+
+
+target_link_libraries(skyline PRIVATE shader_recompiler audio_core dynarmic)
+target_link_libraries_system(skyline android perfetto fmt lz4_static tzcode vkma mbedcrypto opus Boost::intrusive Boost::container Boost::preprocessor Boost::regex range-v3 adrenotools tsl::robin_map)

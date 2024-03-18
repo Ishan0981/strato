@@ -1,9 +1,9 @@
 plugins {
     id 'com.android.application'
-    id 'kotlin-android'
-    id 'kotlin-kapt'
     id 'com.google.dagger.hilt.android'
     id 'idea'
+    id 'org.jetbrains.kotlin.android'
+    id 'org.jetbrains.kotlin.kapt'
     id 'org.jetbrains.kotlin.plugin.serialization' version "$kotlin_version"
 }
 
@@ -15,7 +15,7 @@ idea.module {
 
 android {
     namespace 'emu.skyline'
-    compileSdk 33
+    compileSdk 34
 
     var isBuildSigned = (System.getenv("CI") == "true") && (System.getenv("IS_SKYLINE_SIGNED") == "true")
 
@@ -23,23 +23,18 @@ android {
         applicationId "skyline.emu"
 
         minSdk 29
-        targetSdk 33
+        targetSdk 34
 
-        versionCode 3
-        versionName "0.0.3"
+        versionCode 1
+        versionName "1.2.0"
 
         ndk {
             //noinspection ChromeOsAbiSupport
             abiFilters "arm64-v8a"
         }
 
-        if (isBuildSigned)
-            manifestPlaceholders += [shouldSaveUserData: "true"]
-        else
-            manifestPlaceholders += [shouldSaveUserData: "false"]
-
-        // Only enable separate process for release builds
-        manifestPlaceholders += [emulationProcess: ""]
+        // Disable the use of a separate process for emulation by default
+        manifestPlaceholders["emulationProcess"] = ""
 
         def locales = ["en", "de", "el", "es", "es-419", "fr", "hu", "id", "it", "ja", "ko", "pl", "ru", "ta", "zh-Hans", "zh-Hant"]
 
@@ -50,7 +45,7 @@ android {
     }
 
     /* JVM Bytecode Options */
-    def javaVersion = JavaVersion.VERSION_1_8
+    def javaVersion = JavaVersion.VERSION_17
     kotlinOptions {
         jvmTarget = javaVersion.toString()
         freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
@@ -85,7 +80,7 @@ android {
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig = isBuildSigned ? signingConfigs.ci : signingConfigs.debug
-            manifestPlaceholders += [emulationProcess: ":emulationProcess"]
+            manifestPlaceholders["emulationProcess"] = ":emulationProcess"
         }
 
         reldebug {
@@ -133,7 +128,7 @@ android {
     }
 
     /* NDK and CMake */
-    ndkVersion '25.0.8775105'
+    ndkVersion '26.1.10909125'
     externalNativeBuild {
         cmake {
             version '3.22.1+'
@@ -164,28 +159,28 @@ android {
 
 dependencies {
     /* Google  */
-    implementation 'androidx.core:core-ktx:1.9.0'
-    implementation 'androidx.appcompat:appcompat:1.6.0'
+    implementation 'androidx.core:core-ktx:1.12.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation 'androidx.preference:preference-ktx:1.2.0'
-    implementation 'androidx.activity:activity-ktx:1.6.1'
-    implementation 'com.google.android.material:material:1.8.0'
+    implementation 'androidx.preference:preference-ktx:1.2.1'
+    implementation 'androidx.activity:activity-ktx:1.8.2'
+    implementation 'com.google.android.material:material:1.10.0'
     implementation 'androidx.documentfile:documentfile:1.0.1'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
-    implementation 'androidx.window:window:1.0.0'
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1"
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.5.1"
-    implementation 'androidx.fragment:fragment-ktx:1.5.5'
+    implementation 'androidx.window:window:1.2.0'
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.6.2"
+    implementation 'androidx.fragment:fragment-ktx:1.6.2'
     implementation "com.google.dagger:hilt-android:$hilt_version"
     kapt "com.google.dagger:hilt-compiler:$hilt_version"
     implementation 'com.google.android.flexbox:flexbox:3.0.0'
 
     /* Kotlin */
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1"
 
     /* JetBrains */
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
     /* Other Java */
     implementation 'info.debatty:java-string-similarity:2.0.0'
